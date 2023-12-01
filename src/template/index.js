@@ -1,18 +1,6 @@
 import run from "aocrunner";
-
-const parseInput = (rawInput) => rawInput;
-
-const part1 = (rawInput) => {
-  const input = parseInput(rawInput);
-
-  return;
-};
-
-const part2 = (rawInput) => {
-  const input = parseInput(rawInput);
-
-  return;
-};
+import part1 from "./part1.js"
+import part2 from "./part2.js"
 
 run({
   part1: {
