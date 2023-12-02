@@ -1,34 +1,33 @@
 import { parseInput } from './shared.js';
 import _ from "lodash-es";
-import * as R from "ramda";
 
 const part2 = (rawInput) => {
   const games = parseInput(rawInput);
 
-  const mins = games.map(([gameNo, cubeSets]) => {
-    const max = {
-      red: 0,
-      blue: 0,
-      green: 0
-    }
-
-    cubeSets.forEach(cubSet => {
-      Object.entries(cubSet).forEach(([color, count]) => {
-        const curr = max[color];
-        if (count > curr) {
-          max[color] = count;
-        }
-      })
-    })
-
-    const minCounts = Object.values(max)
-
-    return [gameNo, minCounts.reduce((acc, count) => acc * count)];
-  });
-
-  // return mins;
-
-  return mins.reduce((acc, [game, power]) => acc + power, 0);
+  // Loop over each game each game
+  return games.map(([gameNo, cubeSets]) =>
+    // In each game, loop over each handful of cubes
+    _(cubeSets)
+      .chain()
+      // Find the max of each color in each handful
+      .reduce((acc, cubSet) => {
+        _(cubSet).toPairs()
+          .forEach(([color, count]) => {
+            const curr = acc[color];
+            if (count > curr) {
+              acc[color] = count;
+            }
+          })
+        return acc;
+      }, { red: 0, blue: 0, green: 0 })
+      // Pull out the numbers
+      .values()
+      // Find the power
+      .reduce((acc, count) => acc * count)
+      .value() // de-chain
+  )
+  // Sum all the powers
+  .reduce((acc, power) => acc + power, 0)
 };
 
 export default part2;
