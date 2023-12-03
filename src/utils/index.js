@@ -12,7 +12,7 @@
  *
  *   correct:
  *
- *     import _ fro 'lodash
+ *     import _ from 'lodash'
  *     import myLib from '../utils/myLib.js'
  *     import { myUtil } from '../utils/index.js'
  *
@@ -22,3 +22,5 @@
  *     import myLib from '../utils/myLib'
  *     import { myUtil } from '../utils'
  */
+
+export * from './grid.js';
