@@ -5,10 +5,10 @@ import part2 from "./part2.js"
 run({
   part1: {
     tests: [
-      // {
-      //   input: ``,
-      //   expected: "",
-      // },
+      {
+        input: ``,
+        expected: "",
+      },
     ],
     solution: part1,
   },
@@ -22,5 +22,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: false,
+  onlyTests: true,
 });
