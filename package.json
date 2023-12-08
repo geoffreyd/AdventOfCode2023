@@ -25,5 +25,6 @@
     "node": ">=20.10.0"
   },
   "dependencies": {
+    "mathjs": "^12.1.0"
   }
 }
