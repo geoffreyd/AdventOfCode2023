@@ -1,7 +1,7 @@
 export const aroundOffsets = [
-  [-1, -1], [-1, 0], [-1, 1],
-  [0, -1], /* self */ [0, 1],
-  [1, -1], [1, 0], [1, 1]
+  [-1, -1], [0, -1], [1, -1],
+  [-1, 0], /* self */ [1, 0],
+  [-1, 1], [0, 1], [1, 1]
 ]
 
 /**
@@ -12,7 +12,7 @@ export const aroundOffsets = [
  * @param {typeof aroundOffsets} [offsets=aroundOffsets] - The offsets to calculate the surrounding points.
  * @returns {Array<Array<[number,number], T>} - An array of points and their corresponding values.
  */
-export function pointsAround(grid, [x1, y1], offsets = aroundOffsets) {
+export function valuesAround(grid, [x1, y1], offsets = aroundOffsets) {
   const vals = [];
   const maxY = grid.length - 1;
   const maxX = grid[0].length - 1;
@@ -27,4 +27,30 @@ export function pointsAround(grid, [x1, y1], offsets = aroundOffsets) {
   })
 
   return vals;
+}
+
+
+export function pointsAround(grid, [x1, y1], offsets = aroundOffsets) {
+  const vals = [];
+  const maxY = grid.length - 1;
+  const maxX = grid[0].length - 1;
+
+  offsets.forEach(([x2, y2]) => {
+    const y = y1 + y2;
+    const x = x1 + x2;
+    if (x < 0 || x > maxX || y < 0 || y > maxY) {
+      return;
+    }
+    vals.push([x, y]);
+  })
+
+  // console.log("pointsAround", [x1, y1], offsets, "=>", vals);
+  return vals;
+}
+
+export function printGrid(grid) {
+  console.log('   ------');
+  grid.forEach(row => {
+    console.log(row.join(''));
+  })
 }
