@@ -54,3 +54,15 @@ export function printGrid(grid) {
     console.log(row.join(''));
   })
 }
+
+export function findInGrid(grid, toFind) {
+  const positions = [];
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[i].length; j++) {
+      if (grid[i][j] === toFind) {
+        positions.push([j, i]);
+      }
+    }
+  }
+  return positions;
+}
