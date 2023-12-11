@@ -13,7 +13,7 @@ const part1 = (rawInput) => {
 
   const connections = generatePairs(galaxies)
 
-  const distances = connections.map(([a, b]) => manhattanDistance(a,b))
+  const distances = connections.map(([a, b]) => manhattanDistance(a, b, galaxies))
 
   return _.sum(distances);
 };
@@ -78,8 +78,15 @@ export function findInGrid(grid, toFind) {
   return positions;
 }
 
-export function manhattanDistance(point1, point2) {
-  return Math.abs(point1[0] - point2[0]) + Math.abs(point1[1] - point2[1]);
+export function manhattanDistance(point1, point2, galaxies) {
+  const p1 = galaxies.indexOf(point1) + 1
+  const p2 = galaxies.indexOf(point2) + 1
+
+  const ret = Math.abs(point1[0] - point2[0]) + Math.abs(point1[1] - point2[1]);
+  if (p1 == 1 && p2 == 3) {
+    console.log('Distance', `[${p1} -> ${p2}]`, '>', ret);
+  }
+  return ret;
 }
 
 export function generatePairs(array) {
