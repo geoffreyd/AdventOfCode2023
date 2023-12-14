@@ -1,21 +1,27 @@
 import { parseInput } from './shared.js';
 import _ from "lodash-es";
 
-const part1 = (rawInput, part2 = false) => {
-  const input = part2 ? rawInput : parseInput(rawInput);
+const part1 = (rawInput) => {
+  const input = parseInput(rawInput);
 
   // return startIsValid('..#.....', [5, 2, 1])
 
   // const input = parseInput(`.???#???#??? 3,1`);
 
   const options = input.map((row, idx) => {
+  // const options = input.map((row, idx) => {
     varCache = {};
-    const variants = getVarients(row.springs, row.counts);
-    const valid = _.filter(
-      Array.from(variants),
-      v => isValid(v, row.counts)
-    ).length
-    console.log('row', idx, row.springs.join(''), row.counts, 'candidates', variants.size, 'valids:',valid);
+
+    const springs = row.springs;
+    const counts = row.counts;
+
+    const variants = new Set;
+    const valid = getVarients(springs, counts, variants);
+    // const valid = _.filter(
+    //   Array.from(variants),
+    //   v => isValid(v, counts)
+    // ).length
+    console.log('row', idx, springs.join(''), counts, 'candidates', variants.size, 'valids:',valid);
     return valid
   })
 
@@ -28,7 +34,9 @@ export default part1;
 function isValid(springs, counts) {
   var groups = springs.split('.')
   .filter(i => i != '')
-  .map(i => i.length)
+    .map(i => i.length)
+
+  if (groups.length !== counts.length) { return false }
   // console.log('checking valid', springs, groups, counts);
 
   return _.isEqual(groups, counts)
@@ -36,32 +44,51 @@ function isValid(springs, counts) {
 
 function startIsValid(springs, counts, fullLength) {
   if (springs.includes('?')) { return false }
-  // if (springs.length < counts[0]) {
-  //   return true;
-  // }
+  if (springs.length > fullLength) { return false }
+
   var groups = springs.split('.')
   .filter(i => i != '')
     .map(i => i.length)
 
+  if (groups.length > counts.length) { return false }
+
+  const not_enough = _.last(groups) < counts[groups.length - 1] && _.last(springs) == '.'
+  if (not_enough) { return false }
+
   const ret = arrComp(counts, groups);
 
-  // console.log('checking valid', springs, counts, groups, ret);
+  const excess = counts.slice(groups.length)
+  const excessSum = _.sum(excess) + _.max([excess.length - 1, 0]);
+
+  // console.log(
+  //   'checking valid',
+  //   _.padEnd(springs, fullLength),
+  //   counts,
+  //   groups,
+  //   [
+  //     fullLength - springs.length,
+  //     excessSum
+  //   ],
+  //   ret && !(ret && fullLength - springs.length < excessSum)
+  // );
+
+  if (ret && fullLength - springs.length < excessSum) {
+    return false
+  }
 
   return ret;
-  return _.startsWith(counts.toString(), groups.slice(0, groups.length-1).toString())
 }
 
 const charSubs = ['.', '#']
 
 let varCache;
 
-function getVarients(springList, counts) {
-  if (varCache[springList.join('')]) {
-    // console.log('cache hit', springList.join(''));
-    return varCache[springList.join('')];
+function getVarients(springList, counts, variants) {
+  let validOptions = 0
+
+  if (varCache[springList]) {
+    return varCache[springList]
   }
-  // console.log('finding variants for', springList.join(''))
-  let variants = new Set;
 
   for (let idx = 0; idx < springList.length; idx++) {
     const char = springList[idx];
@@ -71,26 +98,23 @@ function getVarients(springList, counts) {
         spring[idx] = subChar
         const springStr = spring.join('')
         const start = spring.slice(0, idx + 1).join('')
-        // console.log('new varient', handChars);
+
         if (!spring.includes('?') && isValid(springStr, counts)) {
-          variants.add(springStr)
+          // variants.add(springStr)
+          validOptions += 1
         } else if(!start.includes('?')) {
           const isValid = startIsValid(start, counts, spring.length)
 
           if (isValid && !start.includes('?')) {
-            const v = getVarients(spring, counts);
-            varCache[springStr] ??= v;
-            if (v.size) {
-              variants = union(variants, v)
-              // console.log(variants);
-            }
+            validOptions += getVarients(spring, counts, variants);
           }
         }
-        // variants = variants.concat(getVarients(spring))
       })
     }
   }
-  return variants;
+  varCache[springList] = validOptions;
+  // return variants;
+  return validOptions
 }
 
 function union(setA, setB) {
