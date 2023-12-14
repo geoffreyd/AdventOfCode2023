@@ -51,7 +51,7 @@ export function pointsAround(grid, [x1, y1], offsets = aroundOffsets) {
 export function printGrid(grid) {
   console.log('   ------');
   grid.forEach(row => {
-    console.log(row.join(''));
+    console.log(Array.isArray(row) ? row.join('') : row);
   })
 }
 
@@ -65,4 +65,16 @@ export function findInGrid(grid, toFind) {
     }
   }
   return positions;
+}
+
+export function rotateGrid(grid, squishToString = false) {
+  let rotatedGrid = [];
+  for (let i = 0; i < grid[0].length; i++) {
+    let row = [];
+    for (let j = grid.length - 1; j >= 0; j--) {
+      row.push(grid[j][i]);
+    }
+    rotatedGrid.push(squishToString ? row.join('') : row);
+  }
+  return rotatedGrid;
 }
