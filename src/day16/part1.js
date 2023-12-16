@@ -5,7 +5,7 @@ import { printGrid } from '../utils/grid.js';
 const part1 = (rawInput) => {
   const input = parseInput(rawInput);
 
-  const energized = followPath(input);
+  const energized = followPath(input, { x: 0, y: 0, direction: 'right' });
 
   // drawEnergised(input, energized);
 
@@ -21,11 +21,11 @@ const directions = {
   up: { x: 0, y: -1 },
 }
 
-function followPath(grid) {
+export function followPath(grid, start) {
   const energizedPoints = new Set();
   const energizedSet = new Set();
 
-  const queue = [{ x: 0, y: 0, direction: 'right' }];
+  const queue = [start];
 
   function queueIf(point) {
     const { x, y, direction } = point;
