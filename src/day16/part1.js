@@ -21,13 +21,34 @@ const directions = {
   up: { x: 0, y: -1 },
 }
 
-export function followPath(grid, start) {
+const transforms = {
+  '\\': {
+    'right': 'down',
+    'down': 'right',
+    'left': 'up',
+    'up': 'left',
+  },
+  '/': {
+    'right': 'up',
+    'down': 'left',
+    'left': 'down',
+    'up': 'right',
+  },
+  '.': {
+    'right': 'right',
+    'down': 'down',
+    'left': 'left',
+    'up': 'up',
+  },
+}
+
+export function followPath(grid, start, log = false) {
   const energizedPoints = new Set();
   const energizedSet = new Set();
 
   const queue = [start];
 
-  function queueIf(point) {
+  function queuePoint(point) {
     const { x, y, direction } = point;
     if (x < 0 || y < 0 || x >= grid[0].length || y >= grid.length) {
       return;
@@ -39,12 +60,12 @@ export function followPath(grid, start) {
     energizedSet.add(`${x},${y},${direction}`);
   }
 
+  function queueDirection(currPoint, direction) {
+    queuePoint({ ...addPoint(currPoint, directions[direction]), direction });
+  }
 
   while (queue.length ) {
-    let currPoint = queue.shift();
-    if (currPoint.x < 0 || currPoint.y < 0 || currPoint.x >= grid[0].length || currPoint.y >= grid.length) {
-      continue;
-    }
+    let currPoint = queue.pop();
 
     let currDirection = currPoint.direction;
     const currValue = grid[currPoint.y][currPoint.x];
@@ -53,63 +74,28 @@ export function followPath(grid, start) {
     switch (currValue) {
       case "|":
         if (currDirection === 'left' || currDirection === 'right') {
-          queueIf({ ...addPoint(currPoint, directions['up']), direction: 'up' });
-          queueIf({ ...addPoint(currPoint, directions['down']), direction: 'down' });
+          queueDirection(currPoint, 'up');
+          queueDirection(currPoint, 'down');
         } else {
-          queueIf({ ...addPoint(currPoint, directions[currDirection]), direction: currDirection });
+          queueDirection(currPoint, currDirection);
         }
         break;
       case "-":
         if (currDirection === 'up' || currDirection === 'down') {
-          queueIf({ ...addPoint(currPoint, directions['left']), direction: 'left' });
-          queueIf({ ...addPoint(currPoint, directions['right']), direction: 'right' });
+          queueDirection(currPoint, 'left');
+          queueDirection(currPoint, 'right');
         } else {
-          queueIf({ ...addPoint(currPoint, directions[currDirection]), direction: currDirection });
+          queueDirection(currPoint, currDirection);
         }
-        break;
-      case "\\":
-        switch (currDirection) {
-          case 'up':
-            queueIf({ ...addPoint(currPoint, directions['left']), direction: 'left' });
-            break;
-          case 'down':
-            queueIf({ ...addPoint(currPoint, directions['right']), direction: 'right' });
-            break;
-          case 'left':
-            queueIf({ ...addPoint(currPoint, directions['up']), direction: 'up' });
-            break;
-          case 'right':
-            queueIf({ ...addPoint(currPoint, directions['down']), direction: 'down' });
-            break;
-        }
-        break;
-      case "/":
-        switch (currDirection) {
-          case 'up':
-            queueIf({ ...addPoint(currPoint, directions['right']), direction: 'right' });
-            break;
-          case 'down':
-            queueIf({ ...addPoint(currPoint, directions['left']), direction: 'left' });
-            break;
-          case 'left':
-            queueIf({ ...addPoint(currPoint, directions['down']), direction: 'down' });
-            break;
-          case 'right':
-            queueIf({ ...addPoint(currPoint, directions['up']), direction: 'up' });
-            break;
-        }
-        break;
-      case ".":
-        queueIf({ ...addPoint(currPoint, directions[currDirection]), direction: currDirection });
         break;
       default:
-        console.log('oops', currValue, currDirection, currPoint);
+        queueDirection(currPoint, transforms[currValue][currDirection]);
         break;
     }
-
   }
-
-  // console.log(energized);
+  if (log) {
+    drawEnergised(grid, energizedSet)
+  }
   return energizedPoints;
 }
 
@@ -127,8 +113,17 @@ function drawEnergised(grid, energized) {
   }
 
   energized.forEach(point => {
-    if (gridCopy[point.y][point.x] == '.') {
-      gridCopy[point.y][point.x] = swap[point.direction] ?? '#';
+    const [x, y, direction] = point.split(',');
+    // console.log(x, y, direction);
+    const existing = gridCopy[y][x];
+    if (existing == '.') {
+      gridCopy[y][x] = swap[direction] ?? '#';
+    } else if (['<', '>', '^', 'v'].includes(existing)) {
+      gridCopy[y][x] = 2;
+    } else if (existing == 2) {
+      gridCopy[y][x] = 3;
+    } else if (existing == 3) {
+      gridCopy[y][x] = 4;
     }
   })
 

@@ -43,4 +43,6 @@ run({
   },
   trimTestInputs: true,
   onlyTests: false,
-});
+},
+  // 'src/day16/cinput_16.txt'
+);
