@@ -35,23 +35,33 @@ export function pointsAround(grid, [x1, y1], offsets = aroundOffsets) {
   const maxY = grid.length - 1;
   const maxX = grid[0].length - 1;
 
-  offsets.forEach(([x2, y2]) => {
+  offsets.forEach(([x2, y2, ...other]) => {
     const y = y1 + y2;
     const x = x1 + x2;
+    // console.log("pointsAround", [x1, y1], [x2, y2], "=>", [x, y], other);
     if (x < 0 || x > maxX || y < 0 || y > maxY) {
       return;
     }
-    vals.push([x, y]);
+    vals.push([x, y, ...other]);
   })
 
   // console.log("pointsAround", [x1, y1], offsets, "=>", vals);
   return vals;
 }
 
-export function printGrid(grid) {
+export function printGrid(grid, pad = false) {
   console.log('   ------');
   grid.forEach(row => {
-    console.log(Array.isArray(row) ? row.join('') : row);
+    if (Array.isArray(row)) {
+      if (pad) {
+        if (pad === true) {
+          pad = 2;
+        }
+        row = row.map(v => v.toString().padStart(pad, ' '));
+      }
+      row = row.join('');
+    }
+    console.log(row);
   })
 }
 
