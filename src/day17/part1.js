@@ -12,7 +12,7 @@ const part1 = (rawInput) => {
   const path = lowestCostPath(input, [0, 0], [input[0].length - 1, input.length - 1]);
   // const path = lowestCostPath(input, [input[0].length - 1, input.length - 1], [0, 0]);
 
-  // drawPath(input, path);
+  drawPath(input, path);
   // return path;
 
   return _.last(path);

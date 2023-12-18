@@ -1,3 +1,6 @@
+import { log } from 'console';
+import _ from "lodash-es";
+
 export const aroundOffsets = [
   [-1, -1], [0, -1], [1, -1],
   [-1, 0], /* self */ [1, 0],
@@ -31,15 +34,15 @@ export function valuesAround(grid, [x1, y1], offsets = aroundOffsets) {
 
 
 export function pointsAround(grid, [x1, y1], offsets = aroundOffsets) {
+  const [[minX, minY], [maxX, maxY]] = gridExtents(grid);
+  // log('extents', [[minX, minY], [maxX, maxY]])
   const vals = [];
-  const maxY = grid.length - 1;
-  const maxX = grid[0].length - 1;
 
   offsets.forEach(([x2, y2, ...other]) => {
     const y = y1 + y2;
     const x = x1 + x2;
     // console.log("pointsAround", [x1, y1], [x2, y2], "=>", [x, y], other);
-    if (x < 0 || x > maxX || y < 0 || y > maxY) {
+    if (x < minX || x > maxX || y < minY || y > maxY) {
       return;
     }
     vals.push([x, y, ...other]);
@@ -63,6 +66,63 @@ export function printGrid(grid, pad = false) {
     }
     console.log(row);
   })
+}
+
+export function gridExtents(grid) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y];
+    if (!row || row.length === 0) {
+      continue;
+    }
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+    if (row.length === 0) {
+      continue;
+    }
+    minX = Math.min(minX, _.findIndex(row, v => v !== undefined && v !== null));
+    maxX = Math.max(maxX, _.findLastIndex(row, v => v !== undefined && v !== null));
+    // for (let x = 0; x < row.length; x++) {
+    //   if (row[x] === undefined) {
+    //     continue;
+    //   }
+    //   minX = Math.min(minX, x);
+    //   maxX = Math.max(maxX, x);
+    // }
+  }
+
+  return [
+    [minX, minY],
+    [maxX, maxY],
+  ];
+}
+
+
+export function printUnknownGrid(grid, pad = false) {
+  const replaces = {
+    '250,250': 'X',
+  }
+  const [[minX, minY], [maxX, maxY]] = gridExtents(grid);
+
+  for (let y = minY; y <= maxY; y++) {
+    const row = grid[y];
+    if (!row || row.length === 0) {
+      continue;
+    }
+    let rowStr = '';
+    for (let x = minX; x <= maxX; x++) {
+      if (replaces[`${x},${y}`]) {
+        rowStr += replaces[`${x},${y}`];
+        continue;
+      }
+      rowStr += row[x] ?? ' ';
+    }
+    console.log(rowStr);
+  }
 }
 
 export function findInGrid(grid, toFind) {
