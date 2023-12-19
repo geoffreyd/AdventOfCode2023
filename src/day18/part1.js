@@ -2,27 +2,32 @@ import { parseInput } from './shared.js';
 import _ from "lodash-es";
 import { printUnknownGrid, pointsAround, gridExtents } from '../utils/grid.js';
 import { log } from 'console';
+import { areaOfPoly, instructionsToPoly } from './part2.js';
 
 const part1 = (rawInput) => {
   const input = parseInput(rawInput);
 
+  const poly = instructionsToPoly(input);
+
+  return areaOfPoly(poly);
+
+
   const start = [250, 250];
   const grid = []
+  // followDirection(grid, input, start);
 
-  followDirection(grid, input, start);
+  // log('extents', gridExtents(grid))
 
-  log('extents', gridExtents(grid))
-
-  const [fill, newGrid] = floodFill(grid, [start[0] -1, start[1] + 1]);
+  // const [fill, newGrid] = floodFill(grid, [start[0] -1, start[1] + 1]);
   // log('new extents', gridExtents(newGrid))
-  printUnknownGrid(newGrid,1);
+  // printUnknownGrid(newGrid,1);
 
   return fill.size;
 };
 
 export default part1;
 
-const directionOffsets = {
+export const directionOffsets = {
   'R': [1, 0],
   'L': [-1, 0],
   'U': [0, 1],
