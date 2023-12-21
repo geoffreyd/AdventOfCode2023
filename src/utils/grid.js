@@ -7,6 +7,12 @@ export const aroundOffsets = [
   [-1, 1], [0, 1], [1, 1]
 ]
 
+export const cardenalOffsets = [
+            [0, -1],
+  [-1, 0], /* self */ [1, 0],
+            [0, 1]
+]
+
 /**
  * Returns an array of points and their corresponding values around a given point in a grid.
  * @template T
@@ -68,7 +74,12 @@ export function printGrid(grid, pad = false) {
   })
 }
 
+const extentCache = new Map();
+
 export function gridExtents(grid) {
+  if (extentCache.has(grid)) {
+    return extentCache.get(grid);
+  }
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -94,6 +105,7 @@ export function gridExtents(grid) {
     //   maxX = Math.max(maxX, x);
     // }
   }
+  extentCache.set(grid, [[minX, minY], [maxX, maxY]]);
 
   return [
     [minX, minY],
@@ -102,8 +114,8 @@ export function gridExtents(grid) {
 }
 
 
-export function printUnknownGrid(grid, pad = false) {
-  const replaces = {
+export function printUnknownGrid(grid, replaces = undefined) {
+  replaces ??= {
     '250,250': 'X',
   }
   const [[minX, minY], [maxX, maxY]] = gridExtents(grid);
